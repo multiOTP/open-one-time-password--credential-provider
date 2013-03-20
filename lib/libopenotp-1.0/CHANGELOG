@@ -1,0 +1,30 @@
+1.0.7-1
+     - Fixed issues with OpenOTP SSL endpoints.
+
+1.0.7
+     - Added support for OpenOTP v1.1.0 and the opneotpSimpleLogin API.
+
+1.0.6
+     - Added support for OpenOTP Server v1.0.17.
+     - Added support for TiQR SessionQR method in TiQR Server v1.0.3-1.
+
+1.0.5
+     - Added compatibility with TiQR Server 1.0.1.
+     - Added the possiblility to set 2 server URLs.
+
+1.0.4
+     - Included TiQR Server API in the library.
+
+1.0.3
+     - Added support for OpenOTP 1.0.11-1.
+
+1.0.2
+     Libopenotp 1.0.2 is required with OpenOTP 1.0.9.
+     - Uses the new openotpChanllenge API with OpenOTP 1.0.9.
+
+1.0.1
+     - New makefiles.
+     - No more dependency on libcsoap.
+     
+1.0.0
+     Initial public release.

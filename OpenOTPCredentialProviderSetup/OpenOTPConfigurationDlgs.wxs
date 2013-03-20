@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/* * * * * * * * * * * * * * * * * * * * *
+**
+** Copyright 2012 Dominik Pretzsch
+** 
+**    Licensed under the Apache License, Version 2.0 (the "License");
+**    you may not use this file except in compliance with the License.
+**    You may obtain a copy of the License at
+** 
+**        http://www.apache.org/licenses/LICENSE-2.0
+** 
+**    Unless required by applicable law or agreed to in writing, software
+**    distributed under the License is distributed on an "AS IS" BASIS,
+**    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+**    See the License for the specific language governing permissions and
+**    limitations under the License.
+**
+** * * * * * * * * * * * * * * * * * * */
+-->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Fragment>
+    <UI>
+      <Dialog Id="ServerConfigurationDlg" Width="370" Height="270" Title="[ProductName] Setup" NoMinimize="yes">
+        
+        <Control Id="ServerUrlLabel" Type="Text" X="45" Y="73" Width="220" Height="15" TabSkip="no" Text="&amp;Server URLs: (mandatory)" />
+        <Control Id="ServerUrlEdit" Type="Edit" X="45" Y="85" Width="220" Height="18" Property="SERVER_URL" Text="{1024}" />
+        <Control Id="ServerUrlInfo" Type="PushButton" X="270" Y="84" Width="18" Height="18" FixedSize="yes" IconSize="16" Text="HelpIcon" Icon="yes">
+          <Publish Event="SpawnDialog" Value="ServerUrlInfoDlg">1</Publish>
+        </Control>
+        
+        <Control Id="DefaultDomainLabel" Type="Text" X="45" Y="110" Width="220" Height="15" TabSkip="no" Text="&amp;Default Domain: (optional)" />
+        <Control Id="DefaultDomainEdit" Type="Edit" X="45" Y="122" Width="220" Height="18" Property="DEFAULT_DOMAIN" Text="{64}" />
+        <Control Id="DefaultDomainInfo" Type="PushButton" X="270" Y="121" Width="18" Height="18" FixedSize="yes" IconSize="16" Text="HelpIcon" Icon="yes">
+          <Publish Event="SpawnDialog" Value="DefaultDomainInfoDlg">1</Publish>
+        </Control>
+
+        <Control Id="LoginTextLabel" Type="Text" X="45" Y="147" Width="220" Height="15" TabSkip="no" Text="&amp;Login Text: (optional)" />
+        <Control Id="LoginTextEdit" Type="Edit" X="45" Y="159" Width="220" Height="18" Property="LOGIN_TEXT" Text="{64}" />
+        <Control Id="LoginTextInfo" Type="PushButton" X="270" Y="158" Width="18" Height="18" FixedSize="yes" IconSize="16" Text="HelpIcon" Icon="yes">
+          <Publish Event="SpawnDialog" Value="LoginTextInfoDlg">1</Publish>
+        </Control>
+
+        <Control Id="ClientIdLabel" Type="Text" X="45" Y="184" Width="220" Height="15" TabSkip="no" Text="&amp;Client ID: (optional)" />
+        <Control Id="ClientIdEdit" Type="Edit" X="45" Y="196" Width="220" Height="18" Property="CLIENT_ID" Text="{64}" />
+        <Control Id="ClientIdInfo" Type="PushButton" X="270" Y="195" Width="18" Height="18" FixedSize="yes" IconSize="16" Text="HelpIcon" Icon="yes">
+          <Publish Event="SpawnDialog" Value="ClientIdInfoDlg">1</Publish>
+        </Control>
+        
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back">
+          <Publish Event="NewDialog" Value="CustomizeDlg">1</Publish>
+        </Control>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="&amp;Next">
+          <Publish Event="NewDialog" Value="SecurityConfigurationDlg">SERVER_URL</Publish>
+          <Publish Event="SpawnDialog" Value="NoServerURLMessageDlg">NOT SERVER_URL</Publish>
+        </Control>
+        
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancel">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+        
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>Setup server URLs, default domain, login text and client ID</Text>
+        </Control>
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>{\WixUI_Font_Title}Configuration 1/3</Text>
+        </Control>
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+        
+      </Dialog>
+    </UI>
+	</Fragment>
+  
+  <Fragment>
+    <UI>
+      <Dialog Id="SecurityConfigurationDlg" Width="370" Height="270" Title="[ProductName] Setup" NoMinimize="yes">
+
+        <Control Id="SecurityConfigurationInfo" Type="Text" X="45" Y="43" Width="300" Height="45" TabSkip="no" Text="!(loc.SecurityConfigurationInfo)" />
+
+        <Control Id="CertificateAuthorityFileLabel" Type="Text" X="45" Y="88" Width="220" Height="15" TabSkip="no" Text="&amp;Certificate Authority File: (optional)" />
+        <Control Id="CertificateAuthorityFileEdit" Type="Edit" X="45" Y="100" Width="220" Height="18" Property="CA_FILE" Text="{512}" />
+        <Control Id="CertificateAuthorityFileInfo" Type="PushButton" X="270" Y="99" Width="18" Height="18" FixedSize="yes" IconSize="16" Text="HelpIcon" Icon="yes">
+          <Publish Event="SpawnDialog" Value="CertificateAuthorityFileInfoDlg">1</Publish>
+        </Control>
+
+        <Control Id="CertificateFileLabel" Type="Text" X="45" Y="125" Width="220" Height="15" TabSkip="no" Text="Certificate &amp;File: (optional)" />
+        <Control Id="CertificateFileEdit" Type="Edit" X="45" Y="137" Width="220" Height="18" Property="CERT_FILE" Text="{512}" />
+        <Control Id="CertificateFileInfo" Type="PushButton" X="270" Y="136" Width="18" Height="18" FixedSize="yes" IconSize="16" Text="HelpIcon" Icon="yes">
+          <Publish Event="SpawnDialog" Value="CertificateFileInfoDlg">1</Publish>
+        </Control>
+
+        <Control Id="CertificatePassword1Label" Type="Text" X="45" Y="162" Width="220" Height="15" TabSkip="no" Text="Certificate &amp;Password: (optional)" />
+        <Control Id="CertificatePassword1Edit" Type="Edit" X="45" Y="174" Width="220" Height="18" Property="CERT_PASSWORD_1" Text="{64}" Password="yes" />
+        <Control Id="CertificatePasswordInfo" Type="PushButton" X="270" Y="173" Width="18" Height="18" FixedSize="yes" IconSize="16" Text="HelpIcon" Icon="yes">
+          <Publish Event="SpawnDialog" Value="CertificatePasswordInfoDlg">1</Publish>
+        </Control>
+
+        <Control Id="CertificatePassword2Label" Type="Text" X="45" Y="199" Width="220" Height="15" TabSkip="no" Text="C&amp;onfirm Password:" />
+        <Control Id="CertificatePassword2Edit" Type="Edit" X="45" Y="211" Width="220" Height="18" Property="CERT_PASSWORD_2" Text="{64}" Password="yes" />
+
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back">
+          <Publish Event="NewDialog" Value="ServerConfigurationDlg">1</Publish>
+        </Control>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="&amp;Next">
+          <Publish Event="SpawnDialog" Value="InvalidPasswordDlg"><![CDATA[CERT_PASSWORD_1 <> CERT_PASSWORD_2]]></Publish>
+          <Publish Event="NewDialog" Value="UserConfigurationDlg"><![CDATA[CERT_PASSWORD_1 = CERT_PASSWORD_2]]></Publish>
+
+          <Publish Property="CERT_PASSWORD" Value="[CERT_PASSWORD_1]" ><![CDATA[CERT_PASSWORD_1 <> "" AND CERT_PASSWORD_1 = CERT_PASSWORD_2]]></Publish>
+        </Control>
+
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancel">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>Setup security using a PKI.</Text>
+        </Control>
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>{\WixUI_Font_Title}Configuration 2/3</Text>
+        </Control>
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+
+      </Dialog>
+    </UI>
+  </Fragment>
+
+  <Fragment>
+    <UI>
+      <Dialog Id="UserConfigurationDlg" Width="370" Height="270" Title="[ProductName] Setup" NoMinimize="yes">
+
+        <Control Id="UserConfigurationInfo" Type="Text" X="45" Y="43" Width="300" Height="45" TabSkip="no" Text="!(loc.UserConfigurationInfo)" />
+
+        <Control Id="UserSettingsLabel" Type="Text" X="45" Y="88" Width="220" Height="15" TabSkip="no" Text="&amp;Settings String: (optional)" />
+        <Control Id="UserSettingsEdit" Type="Edit" X="45" Y="100" Width="220" Height="18" Property="USER_SETTINGS" Text="{1024}" />
+        <Control Id="UserSettingsInfo" Type="PushButton" X="270" Y="99" Width="18" Height="18" FixedSize="yes" IconSize="16" Text="HelpIcon" Icon="yes">
+          <Publish Event="SpawnDialog" Value="UserSettingsInfoDlg">1</Publish>
+        </Control>
+
+        <Control Id="SoapTimeoutLabel" Type="Text" X="45" Y="125" Width="220" Height="15" TabSkip="no" Text="SOAP &amp;Timeout: (optional)" />
+        <Control Id="SoapTimeoutEdit" Type="Edit" X="45" Y="137" Width="220" Height="18" Property="SOAP_TIMEOUT" Text="{3}" Integer="yes" />
+        <Control Id="SoapTimeoutInfo" Type="PushButton" X="270" Y="136" Width="18" Height="18" FixedSize="yes" IconSize="16" Text="HelpIcon" Icon="yes">
+          <Publish Event="SpawnDialog" Value="SoapTimeoutInfoDlg">1</Publish>
+        </Control>
+
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back">
+          <Publish Event="NewDialog" Value="SecurityConfigurationDlg">1</Publish>
+        </Control>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="&amp;Next">
+          <Publish Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+          <Publish Property="SOAP_TIMEOUT" Value="0" >NOT SOAP_TIMEOUT</Publish>
+          
+          <!-- Re-populate the configuration to the registry -->
+          <Publish Event="ReinstallMode" Value="m" Order="1">Installed</Publish>
+          <Publish Event="Reinstall" Value="MainInstall" Order="2">Installed</Publish>
+        </Control>
+
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancel">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>Setup preferences for this machine.</Text>
+        </Control>
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>{\WixUI_Font_Title}Configuration 3/3</Text>
+        </Control>
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+
+      </Dialog>
+    </UI>
+  </Fragment>
+
+  <Fragment>
+    <UI>
+      <Dialog Id="NoServerURLMessageDlg" Width="260" Height="85" Title="[ProductName] Setup" NoMinimize="yes">
+        <Control Id="Icon" Type="Icon" X="15" Y="15" Width="24" Height="24"
+          ToolTip="Information icon" FixedSize="yes" IconSize="32" Text="ExclamIcon" />
+        <Control Id="Return" Type="PushButton" X="100" Y="57" Width="56" Height="17" Default="yes" Cancel="yes" Text="&amp;Return">
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>
+        <Control Id="Text" Type="Text" X="48" Y="15" Width="194" Height="30" TabSkip="no">
+          <Text>
+            Please specify at least a server URL.
+          </Text>
+        </Control>
+      </Dialog>
+    </UI>
+
+    <UI>
+      <Dialog Id="InvalidPasswordDlg" Width="260" Height="85" Title="[ProductName] Setup" NoMinimize="yes">
+        <Control Id="Icon" Type="Icon" X="15" Y="15" Width="24" Height="24"
+          ToolTip="Information icon" FixedSize="yes" IconSize="32" Text="ExclamIcon" />
+        <Control Id="Return" Type="PushButton" X="100" Y="57" Width="56" Height="17" Default="yes" Cancel="yes" Text="&amp;Return">
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>
+        <Control Id="Text1" Type="Text" X="48" Y="15" Width="194" Height="30" TabSkip="no">
+          <Text>
+            The entered passwords do not match.
+          </Text>
+        </Control>
+      </Dialog>
+    </UI>
+
+    <!-- Configuration Help -->
+    <UI>
+      <Dialog Id="ServerUrlInfoDlg" Width="500" Height="100" Title="[ProductName] Setup" NoMinimize="yes" >
+        <Control Id="Icon" Type="Icon" X="15" Y="15" Width="24" Height="24"
+          ToolTip="Information icon" FixedSize="yes" IconSize="32" Text="InfoIcon" />
+        <Control Id="Return" Type="PushButton" X="340" Y="80" Width="56" Height="17" Default="yes" Cancel="yes" Text="&amp;Return">
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>
+        <Control Id="Text1" Type="Text" X="48" Y="0" Width="482" Height="75" TabSkip="no" NoPrefix="yes" NoWrap="no">
+          <Text>
+            !(loc.ServerUrlInfo)
+          </Text>
+        </Control>
+      </Dialog>
+    </UI>
+
+    <UI>
+      <Dialog Id="DefaultDomainInfoDlg" Width="500" Height="100" Title="[ProductName] Setup" NoMinimize="yes" >
+        <Control Id="Icon" Type="Icon" X="15" Y="15" Width="24" Height="24"
+          ToolTip="Information icon" FixedSize="yes" IconSize="32" Text="InfoIcon" />
+        <Control Id="Return" Type="PushButton" X="340" Y="80" Width="56" Height="17" Default="yes" Cancel="yes" Text="&amp;Return">
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>
+        <Control Id="Text1" Type="Text" X="48" Y="0" Width="482" Height="75" TabSkip="no" NoPrefix="yes" NoWrap="no">
+          <Text>
+            !(loc.DefaultDomainInfo)
+          </Text>
+        </Control>
+      </Dialog>
+    </UI>
+
+    <UI>
+      <Dialog Id="LoginTextInfoDlg" Width="500" Height="100" Title="[ProductName] Setup" NoMinimize="yes" >
+        <Control Id="Icon" Type="Icon" X="15" Y="15" Width="24" Height="24"
+          ToolTip="Information icon" FixedSize="yes" IconSize="32" Text="InfoIcon" />
+        <Control Id="Return" Type="PushButton" X="340" Y="80" Width="56" Height="17" Default="yes" Cancel="yes" Text="&amp;Return">
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>
+        <Control Id="Text1" Type="Text" X="48" Y="0" Width="482" Height="75" TabSkip="no" NoPrefix="yes" NoWrap="no">
+          <Text>
+            !(loc.LoginTextInfo)
+          </Text>
+        </Control>
+      </Dialog>
+    </UI>
+
+    <UI>
+      <Dialog Id="ClientIdInfoDlg" Width="500" Height="100" Title="[ProductName] Setup" NoMinimize="yes" >
+        <Control Id="Icon" Type="Icon" X="15" Y="15" Width="24" Height="24"
+          ToolTip="Information icon" FixedSize="yes" IconSize="32" Text="InfoIcon" />
+        <Control Id="Return" Type="PushButton" X="340" Y="80" Width="56" Height="17" Default="yes" Cancel="yes" Text="&amp;Return">
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>
+        <Control Id="Text1" Type="Text" X="48" Y="0" Width="482" Height="75" TabSkip="no" NoPrefix="yes" NoWrap="no">
+          <Text>
+            !(loc.ClientIdInfo)
+          </Text>
+        </Control>
+      </Dialog>
+    </UI>
+
+    <UI>
+      <Dialog Id="CertificateAuthorityFileInfoDlg" Width="500" Height="100" Title="[ProductName] Setup" NoMinimize="yes" >
+        <Control Id="Icon" Type="Icon" X="15" Y="15" Width="24" Height="24"
+          ToolTip="Information icon" FixedSize="yes" IconSize="32" Text="InfoIcon" />
+        <Control Id="Return" Type="PushButton" X="340" Y="80" Width="56" Height="17" Default="yes" Cancel="yes" Text="&amp;Return">
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>
+        <Control Id="Text1" Type="Text" X="48" Y="0" Width="482" Height="75" TabSkip="no" NoPrefix="yes" NoWrap="no"> 
+          <Text>
+            !(loc.CertificateAuthorityFileInfo)
+          </Text>
+        </Control>
+      </Dialog>
+    </UI>
+
+    <UI>
+      <Dialog Id="CertificateFileInfoDlg" Width="500" Height="100" Title="[ProductName] Setup" NoMinimize="yes" >
+        <Control Id="Icon" Type="Icon" X="15" Y="15" Width="24" Height="24"
+          ToolTip="Information icon" FixedSize="yes" IconSize="32" Text="InfoIcon" />
+        <Control Id="Return" Type="PushButton" X="340" Y="80" Width="56" Height="17" Default="yes" Cancel="yes" Text="&amp;Return">
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>
+        <Control Id="Text1" Type="Text" X="48" Y="0" Width="482" Height="75" TabSkip="no" NoPrefix="yes" NoWrap="no">
+          <Text>
+            !(loc.CertificateFileInfo)
+          </Text>
+        </Control>
+      </Dialog>
+    </UI>
+
+    <UI>
+      <Dialog Id="CertificatePasswordInfoDlg" Width="500" Height="100" Title="[ProductName] Setup" NoMinimize="yes" >
+        <Control Id="Icon" Type="Icon" X="15" Y="15" Width="24" Height="24"
+          ToolTip="Information icon" FixedSize="yes" IconSize="32" Text="InfoIcon" />
+        <Control Id="Return" Type="PushButton" X="340" Y="80" Width="56" Height="17" Default="yes" Cancel="yes" Text="&amp;Return">
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>
+        <Control Id="Text1" Type="Text" X="48" Y="0" Width="482" Height="75" TabSkip="no" NoPrefix="yes" NoWrap="no">
+          <Text>
+            !(loc.CertificatePasswordInfo)
+          </Text>
+        </Control>
+      </Dialog>
+    </UI>
+
+    <UI>
+      <Dialog Id="UserSettingsInfoDlg" Width="500" Height="100" Title="[ProductName] Setup" NoMinimize="yes" >
+        <Control Id="Icon" Type="Icon" X="15" Y="15" Width="24" Height="24"
+          ToolTip="Information icon" FixedSize="yes" IconSize="32" Text="InfoIcon" />
+        <Control Id="Return" Type="PushButton" X="340" Y="80" Width="56" Height="17" Default="yes" Cancel="yes" Text="&amp;Return">
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>
+        <Control Id="Text1" Type="Text" X="48" Y="0" Width="482" Height="75" TabSkip="no" NoPrefix="yes" NoWrap="no">
+          <Text>
+            !(loc.UserSettingsInfo)
+          </Text>
+        </Control>
+      </Dialog>
+    </UI>
+
+    <UI>
+      <Dialog Id="SoapTimeoutInfoDlg" Width="500" Height="100" Title="[ProductName] Setup" NoMinimize="yes" >
+        <Control Id="Icon" Type="Icon" X="15" Y="15" Width="24" Height="24"
+          ToolTip="Information icon" FixedSize="yes" IconSize="32" Text="InfoIcon" />
+        <Control Id="Return" Type="PushButton" X="340" Y="80" Width="56" Height="17" Default="yes" Cancel="yes" Text="&amp;Return">
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>
+        <Control Id="Text1" Type="Text" X="48" Y="0" Width="482" Height="75" TabSkip="no" NoPrefix="yes" NoWrap="no">
+          <Text>
+            !(loc.SoapTimeoutInfo)
+          </Text>
+        </Control>
+      </Dialog>
+    </UI>
+    <!-- END Configuration Help -->
+  </Fragment>
+</Wix>

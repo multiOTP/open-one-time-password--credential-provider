@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/* * * * * * * * * * * * * * * * * * * * *
+**
+** Copyright 2012 Dominik Pretzsch
+** 
+**    Licensed under the Apache License, Version 2.0 (the "License");
+**    you may not use this file except in compliance with the License.
+**    You may obtain a copy of the License at
+** 
+**        http://www.apache.org/licenses/LICENSE-2.0
+** 
+**    Unless required by applicable law or agreed to in writing, software
+**    distributed under the License is distributed on an "AS IS" BASIS,
+**    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+**    See the License for the specific language governing permissions and
+**    limitations under the License.
+**
+** * * * * * * * * * * * * * * * * * * */
+-->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?include $(sys.CURRENTDIR)\Config.wxi?>
+  
+  <!-- Preconditions and pre-setups -->
+  <Product Id="5B9A5AFE-EE8F-430B-AA2E-9D4B8AB0AF63" Language="1033"
+           Name="$(var.ProductName)"
+           Manufacturer="$(var.Publisher)"
+           Version="$(var.Version)"
+           UpgradeCode="cbdac7c5-20dc-425d-93f1-4afc19873074">
+
+    <Package Id="*" InstallerVersion="200" Compressed="yes" InstallScope="perMachine"
+             Manufacturer="$(var.Publisher)"
+             Description="$(var.ProductName) $(var.Version) Setup"
+             Comments="A Comment" />
+
+    <Property Id="ARPURLINFOABOUT" Value="$(var.AppURLInfoAbout)" />
+
+    <Condition Message="You need to be an administrator to install this product.">
+      Privileged
+    </Condition>
+
+    <Media Id='1' Cabinet='Sample.cab' EmbedCab='yes' DiskPrompt='DISK #1' />
+    <Property Id='DiskPrompt' Value="$(var.ProductName) Setup [1]" />
+
+    <Binary Id='WiXCustomActions' SourceFile='$(var.WiXCustomActions.TargetPath)' />
+    
+    <Binary Id='InfoIcon' SourceFile='$(var.SolutionDir)info.ico' />
+    <Binary Id='HelpIcon' SourceFile='$(var.SolutionDir)help.ico' />
+    <Binary Id='ExclamIcon' SourceFile='$(var.SolutionDir)exclam.ico' />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of $(var.ProductName) is already installed." />
+  <!-- END Preconditions and pre-setups -->
+
+    <!-- Get values from registry if available. (What if unattended/silent install?)-->
+    <Property Id="SERVER_URL">
+      <RegistrySearch Id="SearchServerUrl"     Root="HKLM" Key="SOFTWARE\$(var.Manufacturer)\$(var.SimpleProductName)" Name="server_url"     Win64="$(var.Win64)" Type="raw"/>
+    </Property>
+    
+    <Property Id="DEFAULT_DOMAIN">
+      <RegistrySearch Id="SearchDefaultDomain" Root="HKLM" Key="SOFTWARE\$(var.Manufacturer)\$(var.SimpleProductName)" Name="default_domain" Win64="$(var.Win64)" Type="raw" />
+    </Property>
+    
+    <Property Id="LOGIN_TEXT">
+      <RegistrySearch Id="SearchLoginText"     Root="HKLM" Key="SOFTWARE\$(var.Manufacturer)\$(var.SimpleProductName)" Name="login_text"     Win64="$(var.Win64)" Type="raw" />
+    </Property>
+    
+    <Property Id="CLIENT_ID">
+      <RegistrySearch Id="SearchClientId"      Root="HKLM" Key="SOFTWARE\$(var.Manufacturer)\$(var.SimpleProductName)" Name="client_id"      Win64="$(var.Win64)" Type="raw" />
+    </Property>
+    
+    <Property Id="CA_FILE">
+      <RegistrySearch Id="SearchCaFile"        Root="HKLM" Key="SOFTWARE\$(var.Manufacturer)\$(var.SimpleProductName)" Name="ca_file"        Win64="$(var.Win64)" Type="raw" />
+    </Property>
+    
+    <Property Id="CERT_FILE">
+      <RegistrySearch Id="SearchCertFile"      Root="HKLM" Key="SOFTWARE\$(var.Manufacturer)\$(var.SimpleProductName)" Name="cert_file"      Win64="$(var.Win64)" Type="raw" />
+    </Property>
+    
+    <Property Id="CERT_PASSWORD">
+      <RegistrySearch Id="SearchCertPassword"  Root="HKLM" Key="SOFTWARE\$(var.Manufacturer)\$(var.SimpleProductName)" Name="cert_password"  Win64="$(var.Win64)" Type="raw" />
+    </Property>
+    
+    <Property Id="USER_SETTINGS">
+      <RegistrySearch Id="SearchUserSettings"  Root="HKLM" Key="SOFTWARE\$(var.Manufacturer)\$(var.SimpleProductName)" Name="user_settings"  Win64="$(var.Win64)" Type="raw" />
+    </Property>
+    
+    <Property Id="SOAP_TIMEOUT">
+      <RegistrySearch Id="SearchSoapTimeout"   Root="HKLM" Key="SOFTWARE\$(var.Manufacturer)\$(var.SimpleProductName)" Name="soap_timeout"   Win64="$(var.Win64)" Type="raw" />
+    </Property>
+    <!-- END Get registry values -->
+    
+    <!-- Sanitize SOAP_TIMEOUT DWORD-value (e.g. #123 -> 123) -->
+    <Property Id="SANITIZE_DWORD" Value="SOAP_TIMEOUT" />
+    <CustomAction Id='SanitizeSoapTimeoutDword' BinaryKey='WiXCustomActions' DllEntry='SanitizeDwordFromRegistry' Execute='firstSequence'/>
+    <InstallUISequence>
+      <Custom Action='SanitizeSoapTimeoutDword' After='CostFinalize'>Installed</Custom>
+    </InstallUISequence>
+    <!-- END Sanitize SOAP_TIMEOUT DWORD-value -->
+    
+    <!-- Check user has administrator privileges -->
+    <CustomAction Id='CheckAdministratorPrivileges' BinaryKey='WiXCustomActions' DllEntry='CheckAdministratorPrivileges' Execute='firstSequence' Return='ignore' />
+    <CustomAction Id='CheckAdministratorPrivilegesFalse' Execute='firstSequence' Error='You must be an Administrator!' />
+    <InstallUISequence>
+      <Custom Action='CheckAdministratorPrivileges' Before='AppSearch'>Installed</Custom>
+      <Custom Action='CheckAdministratorPrivilegesFalse' After='CheckAdministratorPrivileges'>Installed AND USER_IS_ADMINISTRATOR = "0"</Custom> 
+    </InstallUISequence>
+    <InstallExecuteSequence>
+      <Custom Action='CheckAdministratorPrivileges' Before='AppSearch'>Installed</Custom>
+      <Custom Action='CheckAdministratorPrivilegesFalse' After='CheckAdministratorPrivileges'>Installed AND USER_IS_ADMINISTRATOR = "0"</Custom>
+    </InstallExecuteSequence>
+    <!-- END Check user has administrator privileges -->
+
+    <!-- Directory definitions -->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+
+      <!-- Visual Studio C++ Redistributable -->
+      <?if $(var.Platform) = x64 ?>
+        <Merge Id="VCRedist" SourceFile="$(var.SolutionDir)lib\merge\Microsoft_VC110_CRT_x64.msm" DiskId="1" Language="0"/>
+      <?else ?>
+        <Merge Id="VCRedist" SourceFile="$(var.SolutionDir)lib\merge\Microsoft_VC110_CRT_x86.msm" DiskId="1" Language="0"/>
+      <?endif ?>
+      <!-- END Visual Studio C++ Redistributable -->
+
+      <!-- Directories/Components to be placed in ProgramFiles-folder -->
+      <Directory Id="$(var.PlatformProgramFilesFolder)">
+        <Directory Id="CompanyFolder" Name="$(var.Publisher)">
+          <Directory Id="INSTALLFOLDER" Name="$(var.ProductFolderName)">
+            
+            <Component Id="DefaultFilesInProgrammFolder" Location="local" Guid="65348e58-dc52-4fa7-8cc3-fe4effcd881a">
+              <!-- Files -->
+              <File Id="LicenseFile"
+                    Name="ApacheLicense.rtf"
+                    Source="$(var.SolutionDir)ApacheLicense.rtf"
+                    KeyPath="yes" />
+
+              <RemoveFile Id="RemoveInstallFiles" Name="*" On="uninstall"/>
+              
+              <!-- Folders -->
+              <RemoveFolder Id="RemoveInstallFolder" On="uninstall"/>
+              <RemoveFolder Id="RemoveCompanyFolderIfEmpty" Directory="CompanyFolder" On="uninstall"/>
+              <!-- END Folders -->
+              <!-- END Files -->
+            </Component>
+            
+          </Directory>
+        </Directory>
+      </Directory>
+      <!-- END Directories/Components to be placed in ProgramFiles-folder -->
+
+      <!-- Directories/Components to be placed in System-folder -->
+      <Directory Id="$(var.PlatformSystemFolder)">
+        
+        <!-- Core components -->
+        <Component Location="local" Guid="3b6008b2-e228-4f6f-a951-b216cf503662">
+          <?if $(var.Platform) = x64 ?>
+            <File Id="LibOpenOTP"
+                  Name="libopenotp.dll"
+                  Source="$(var.SolutionDir)lib\libopenotp-1.0\build_win64\libopenotp.dll"
+                  KeyPath="yes">
+            </File>
+          <?else ?>
+            <File Id="LibOpenOTP"
+                  Name="libopenotp.dll"
+                  Source="$(var.SolutionDir)lib\libopenotp-1.0\build_win32\libopenotp.dll"
+                  KeyPath="yes">
+            </File>
+          <?endif ?>
+
+          <RemoveFile Id="RemoveLibOpenOTPFiles" Name="libopenotp.dll" On="uninstall"/>
+        </Component>
+        
+        <Component Location="local" Guid="483c55d0-331d-468b-b077-53f9d7205a01">
+          <!-- Files -->
+          <File Id="OpenOTPCredentialProvider"
+                Name="$(var.OpenOTPCredentialProvider.TargetFileName)"
+                Source="$(var.OpenOTPCredentialProvider.TargetPath)"
+                KeyPath="yes" />
+
+          <RemoveFile Id="RemoveOpenOTPCredentialProviderFiles" Name="$(var.OpenOTPCredentialProvider.TargetFileName)" On="uninstall"/>
+          <!-- END Files -->
+
+          <!-- Registry -->
+          <RegistryKey Root='HKCR' Key='CLSID\{08610F81-99C2-469F-AC93-650E9E3ED0BA}' ForceCreateOnInstall='yes'>
+            <RegistryValue Type='string' Value='OpenOTPCredentialProvider' />
+            <RegistryKey Key='InprocServer32'>
+              <RegistryValue Type='string' Value='OpenOTPCredentialProvider.dll' />
+              <RegistryValue Name='ThreadingModel' Type='string' Value='Apartment' />
+            </RegistryKey>
+          </RegistryKey>
+
+          <RegistryValue Root='HKLM' Key='SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers\{08610F81-99C2-469F-AC93-650E9E3ED0BA}' Type='string' Value='OpenOTPCredentialProvider' />
+          <RemoveRegistryKey Root='HKLM' Key='SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers\{08610F81-99C2-469F-AC93-650E9E3ED0BA}' Action='removeOnUninstall'/>
+
+          <!-- Configuration values (from dialogs/registry/unattended) -->
+          <RegistryKey Root='HKLM' Key='SOFTWARE\$(var.Manufacturer)\$(var.SimpleProductName)' ForceCreateOnInstall='yes'>
+            <RegistryValue Name='server_url'     Type='string'  Value='[SERVER_URL]'     />
+            <RegistryValue Name='default_domain' Type='string'  Value='[DEFAULT_DOMAIN]' />
+            <RegistryValue Name='login_text'     Type='string'  Value='[LOGIN_TEXT]'     />
+            <RegistryValue Name='client_id'      Type='string'  Value='[CLIENT_ID]'      />
+            <RegistryValue Name='ca_file'        Type='string'  Value='[CA_FILE]'        />
+            <RegistryValue Name='cert_file'      Type='string'  Value='[CERT_FILE]'      />
+            <RegistryValue Name='cert_password'  Type='string'  Value='[CERT_PASSWORD]'  />
+            <RegistryValue Name='user_settings'  Type='string'  Value='[USER_SETTINGS]'  />
+            <RegistryValue Name='soap_timeout'   Type='integer' Value='[SOAP_TIMEOUT]'   />
+          </RegistryKey>
+          <!-- END Configuration values -->
+          <!-- END Registry -->
+          
+        </Component>
+        <!-- END Core components -->
+        
+        <!-- ProviderFilter component -->
+        <Component Location="local" Guid="edb4b736-d7f8-452e-8af9-e8c5a1b0487b">
+          <!-- Files -->
+          <File Id="OpenOTPCredentialProviderFilter"
+                Name="$(var.OpenOTPCredentialProviderFilter.TargetFileName)"
+                Source="$(var.OpenOTPCredentialProviderFilter.TargetPath)"
+                KeyPath="yes" />
+
+          <RemoveFile Id="RemoveOpenOTPCredentialProviderFilterFiles" Name="$(var.OpenOTPCredentialProviderFilter.TargetFileName)" On="uninstall" />
+          <!-- END Files -->
+
+          <!-- Registry -->
+          <RegistryKey Root='HKCR' Key='CLSID\{5AE8C610-7541-4FF8-9845-C363410D574C}' ForceCreateOnInstall='yes'>
+            <RegistryValue Type='string' Value='OpenOTPCredentialProviderFilter' />
+            <RegistryKey Key='InprocServer32'>
+              <RegistryValue Type='string' Value='OpenOTPCredentialProviderFilter.dll' />
+              <RegistryValue Name='ThreadingModel' Type='string' Value='Apartment' />
+            </RegistryKey>
+          </RegistryKey>         
+          <!-- END Registry -->
+        </Component>
+        <!-- END ProviderFilter component -->
+
+        <!-- Activate ProviderFilter (InstallAsDefault) component -->
+        <Component Id="ActivateCredentialProviderFilter" Location="local" Guid="949114a2-3d8a-4228-8fe2-8c885fb71cbf">
+          <RegistryValue Root='HKLM' Key='SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Provider Filters\{5AE8C610-7541-4FF8-9845-C363410D574C}' Type='string' Value='OpenOTPCredentialProviderFilter' KeyPath='yes' />
+          <RemoveRegistryKey Root='HKLM' Key='SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Provider Filters\{5AE8C610-7541-4FF8-9845-C363410D574C}' Action='removeOnUninstall'/>
+        </Component>
+        <!-- END Activate ProviderFilter component -->
+        
+      </Directory>
+      <!-- END Directories/Components to be placed in System-folder -->
+      
+    </Directory>
+    <!-- END Directory definitions -->
+
+    <!-- Feature definitions -->
+    <Feature Id='Complete' Title='$(var.ProductName)' Description='Full install' Display='expand' Level='1' ConfigurableDirectory='INSTALLFOLDER' AllowAdvertise='no' Absent='disallow' InstallDefault="local">
+      <Feature Id='MainInstall' Title='Core components' Description='Core $(var.ProductName) components' Level='1' AllowAdvertise='no' Absent='disallow' InstallDefault="local">
+        <ComponentRef Id='LibOpenOTP' />
+        <ComponentRef Id='OpenOTPCredentialProvider' />
+        <ComponentRef Id='OpenOTPCredentialProviderFilter' />
+      </Feature>
+      
+      <Feature Id='InstallAsDefault' Title='Default provider' Description='Install $(var.ProductName) as default provider. No other provider will be allowed to be used for logon.' Level='1000' AllowAdvertise='no' InstallDefault="local">
+        <ComponentRef Id='ActivateCredentialProviderFilter' />
+      </Feature>
+
+      <!-- These are installed anyway: -->
+      <Feature Id="VCRedist" Title="Visual C++ 11.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+        <MergeRef Id='VCRedist'/>
+      </Feature>
+      
+      <ComponentRef Id='DefaultFilesInProgrammFolder' />
+    </Feature>
+    <!-- END Feature definitions -->
+
+    <!-- WiX Configuration -->
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)ApacheLicense.rtf" />
+    
+    <?ifdef RCDevs ?>
+      <WixVariable Id="WixUIBannerBmp" Value="$(var.SolutionDir)WixUIBannerBmp.bmp" />
+      <WixVariable Id="WixUIDialogBmp" Value="$(var.SolutionDir)WixUIDialogBmp.bmp" />
+    <?endif ?>
+    <!-- END WiX Configuration -->
+
+    <!-- UI Configuration -->
+    <UI Id="MyWixUI_FeatureTree">
+      <UIRef Id="WixUI_FeatureTree"/>
+      
+      <!-- Custom dialogs -->
+      <DialogRef Id="ServerConfigurationDlg" />
+      <DialogRef Id="SecurityConfigurationDlg" />
+      <DialogRef Id="UserConfigurationDlg" />
+
+      <!-- Queue custom dialogs start/end -->
+      <!-- Start -->
+        <Publish Dialog="CustomizeDlg" Control="Next" Event="NewDialog" Value="ServerConfigurationDlg">1</Publish>
+      <!-- End -->
+        <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UserConfigurationDlg" Order="1">NOT Installed OR WixUI_InstallMode = "Change"</Publish>
+      <!-- END Queue custom dialogs -->
+    </UI>
+    <!-- END UI Configuration -->
+
+    </Product>
+</Wix>

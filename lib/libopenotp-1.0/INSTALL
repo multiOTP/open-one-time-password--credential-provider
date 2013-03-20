@@ -1,0 +1,17 @@
+To install libopenotp or your system:
+
+Libopenotp requires libxml2 development library from http://xmlsoft.org/,
+Zlib development library from from http://zlib.net/,
+and openssl development library from http://www.openssl.org/.
+
+1) Make sure you have libxml2 and openssl development libraries installed.
+   On a RedHat / Centos system you can install the dependencies with:
+   yum install libxml2-devel zlib-devel openssl-devel.
+2) Compile libopenotp with 'make' command in the current directory.
+3) Install libopenotp in /usr/lib/ or /usr/lib64/ with 'make install' command.
+
+Alternativelly, you can use the precompiled library for Linux and Windows in build_xxx/
+The precompiled libraries do not have any library dependencies.
+
+1) Copy build_xxx/libopenotp.so* and libopenotp.a in /usr/lib/ or /usr/lib64/.
+2) Copy build_xxx/openotp.h and build_xxx/opensso.h in /usr/include/.

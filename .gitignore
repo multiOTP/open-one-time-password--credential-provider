@@ -1,0 +1,7 @@
+
+*.opensdf
+*.suo
+/WixUIBannerBmp.bmp
+/WixUIBannerBmp.psd
+/WixUIDialogBmp.bmp
+/WixUIDialogBmp.psd

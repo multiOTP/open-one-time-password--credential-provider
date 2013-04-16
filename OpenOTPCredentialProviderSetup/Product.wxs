@@ -33,6 +33,12 @@
              Description="$(var.ProductName) $(var.Version) Setup"
              Comments="A Comment" />
 
+    <!-- <Upgrade Id='cbdac7c5-20dc-425d-93f1-4afc19873074'>
+      <UpgradeVersion OnlyDetect='yes' Property='SELFFOUND' 
+                      Minimum='1.0.0' IncludeMinimum='yes'
+                      Maximum='$(var.Version)' IncludeMaximum='no'/>
+    </Upgrade> -->
+
     <Property Id="ARPURLINFOABOUT" Value="$(var.AppURLInfoAbout)" />
 
     <Condition Message="You need to be an administrator to install this product.">

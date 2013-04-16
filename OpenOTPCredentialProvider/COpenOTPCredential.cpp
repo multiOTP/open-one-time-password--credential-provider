@@ -35,18 +35,18 @@ COpenOTPCredential::COpenOTPCredential():
 {
     DllAddRef();
 
-    ZeroMemory(_rgCredProvFieldDescriptors, sizeof(_rgCredProvFieldDescriptors));
-    ZeroMemory(_rgFieldStatePairs, sizeof(_rgFieldStatePairs));
-    ZeroMemory(_rgFieldStrings, sizeof(_rgFieldStrings));
+    ZERO(_rgCredProvFieldDescriptors);
+    ZERO(_rgFieldStatePairs);
+    ZERO(_rgFieldStrings);
 
-	ZeroMemory(_openotp_server_url, sizeof(_openotp_server_url));
-	ZeroMemory(_openotp_cert_file, sizeof(_openotp_cert_file));
-	ZeroMemory(_openotp_cert_password, sizeof(_openotp_cert_password));
-	ZeroMemory(_openotp_ca_file, sizeof(_openotp_ca_file));
-	ZeroMemory(_openotp_client_id, sizeof(_openotp_client_id));
-	ZeroMemory(_openotp_default_domain, sizeof(_openotp_default_domain));
-	ZeroMemory(_openotp_user_settings, sizeof(_openotp_user_settings));
-	ZeroMemory(_openotp_login_text, sizeof(_openotp_login_text));
+	ZERO(_openotp_server_url);
+	ZERO(_openotp_cert_file);
+	ZERO(_openotp_cert_password);
+	ZERO(_openotp_ca_file);
+	ZERO(_openotp_client_id);
+	ZERO(_openotp_default_domain);
+	ZERO(_openotp_user_settings);
+	ZERO(_openotp_login_text);
 
 	_openotp_login_request = *openotp_login_req_new();
 
@@ -110,13 +110,13 @@ COpenOTPCredential::~COpenOTPCredential()
     }
 
 	/// Make sure _openotp-runtime is clean
-	ZeroMemory(_openotp_server_url, sizeof(_openotp_server_url));
-	ZeroMemory(_openotp_cert_file, sizeof(_openotp_cert_file));
-	ZeroMemory(_openotp_ca_file, sizeof(_openotp_ca_file));
-	ZeroMemory(_openotp_client_id, sizeof(_openotp_client_id));
-	ZeroMemory(_openotp_default_domain, sizeof(_openotp_default_domain));
-	ZeroMemory(_openotp_user_settings, sizeof(_openotp_user_settings));
-	ZeroMemory(_openotp_login_text, sizeof(_openotp_login_text));
+	ZERO(_openotp_server_url);
+	ZERO(_openotp_cert_file);
+	ZERO(_openotp_ca_file);
+	ZERO(_openotp_client_id);
+	ZERO(_openotp_default_domain);
+	ZERO(_openotp_user_settings);
+	ZERO(_openotp_login_text);
 
 	SecureZeroMemory(_openotp_cert_password, sizeof(_openotp_cert_password));
 
@@ -531,16 +531,30 @@ HRESULT COpenOTPCredential::GetSerialization(
 	HRESULT hrOpenOtp, hr = E_FAIL;
 	BOOL error = false;
 
-	wchar_t username[64], domain[64];
+	INIT_ZERO_WCHAR(username, 64);
+	INIT_ZERO_WCHAR(domain, 64);
 
-	ZeroMemory(username, sizeof(username));
-	ZeroMemory(domain, sizeof(domain));
+	_SeparateUserAndDomainName(_rgFieldStrings[SFI_OTP_USERNAME], username, sizeof(username), domain, sizeof(domain));
 
-	_GetUserAndDomainName(_rgFieldStrings[SFI_OTP_USERNAME], username, sizeof(username), domain, sizeof(domain));
-
-	// Overwrite global domain name
+	// Set domain name:
 	if (domain[0])
+		// ... user typed DOMAIN\USERNAME, so we set it to DOMAIN
 		_domain_name = _wcsdup(domain);
+	else
+	{
+		if ((!_domain_name || !_domain_name[0]) && _openotp_default_domain && _openotp_default_domain[0])
+		{
+			// ... _domain_name is not set (logon scenario is most likely NOT unlock) and a default domain exists, so we set it to the default openotp domain
+
+			// TODO: Preset arguments using a macro (even for the vice versa function) and NOT using a function
+			int size = MultiByteToWideChar(CP_ACP, 0, _openotp_default_domain, -1, domain, 0);
+			MultiByteToWideChar(CP_ACP, 0, _openotp_default_domain, -1, domain, size);
+
+			_domain_name = _wcsdup(domain);
+		}
+
+		// ... _domain_name already set or no default domain, nothing to do
+	}
 
 	/* DEBUG:
 	wcscpy_s(domain, sizeof(domain), L"DEMOS");
@@ -549,7 +563,8 @@ HRESULT COpenOTPCredential::GetSerialization(
 
 	if (!_openotp_is_challenge_request)
 	{   
-		hrOpenOtp = _OpenOTPCheck(username, domain, _rgFieldStrings[SFI_OTP_LDAP_PASS], _rgFieldStrings[SFI_OTP_PASS]);
+		//hrOpenOtp = _OpenOTPCheck(username, domain, _rgFieldStrings[SFI_OTP_LDAP_PASS], _rgFieldStrings[SFI_OTP_PASS]);
+		hrOpenOtp = _OpenOTPCheck(username, _domain_name, _rgFieldStrings[SFI_OTP_LDAP_PASS], _rgFieldStrings[SFI_OTP_PASS]);
 	}
 	else
 		hrOpenOtp = _OpenOTPChallenge(_rgFieldStrings[SFI_OTP_CHALLENGE]);
@@ -571,7 +586,7 @@ HRESULT COpenOTPCredential::GetSerialization(
 			_openotp_is_challenge_request = true;
 
 			wchar_t large_text[100], small_text[100];
-			MultiByteToWideChar(CP_ACP, 0, _openotp_login_response.message, -1, large_text, sizeof(large_text));
+			MultiByteToWideChar(CP_ACP, 0, _openotp_login_response.message, -1, large_text, sizeof(large_text) / sizeof(large_text[0]));
 
 			swprintf_s(small_text, sizeof(small_text), OPENOTP_TIMEOUT_TEXT, _openotp_login_response.timeout);
 
@@ -612,9 +627,7 @@ HRESULT COpenOTPCredential::GetSerialization(
 			if (_openotp_login_response.message)
 			{
 				wchar_t error_msg[100];
-
-				/*int size = */MultiByteToWideChar(CP_ACP, 0, _openotp_login_response.message, -1, error_msg, sizeof(error_msg));
-				//MultiByteToWideChar(CP_ACP, 0, _openotp_login_response.message, -1, error_msg, size);
+				MultiByteToWideChar(CP_ACP, 0, _openotp_login_response.message, -1, error_msg, sizeof(error_msg) / sizeof(error_msg[0]));
 
 				SHStrDupW(error_msg, ppwszOptionalStatusText);
 			}
@@ -659,7 +672,7 @@ HRESULT COpenOTPCredential::GetSerialization(
 		if (_openotp_challenge_response.message)
 		{
 			wchar_t error_msg[100];
-			MultiByteToWideChar(CP_ACP, 0, _openotp_challenge_response.message, -1, error_msg, sizeof(error_msg));
+			MultiByteToWideChar(CP_ACP, 0, _openotp_challenge_response.message, -1, error_msg, sizeof(error_msg) / sizeof(error_msg[0]));
 
 			SHStrDupW(error_msg, ppwszOptionalStatusText);
 		}
@@ -676,8 +689,8 @@ HRESULT COpenOTPCredential::GetSerialization(
 	}
 
 CleanUpAndReturn:
-	ZeroMemory(username, sizeof(username));
-	ZeroMemory(domain, sizeof(domain));
+	ZERO(username);
+	ZERO(domain);
 
 	if (error)
 	{
@@ -702,12 +715,12 @@ HRESULT COpenOTPCredential::_DoKerberosLogon(
     DWORD cch = ARRAYSIZE(wsz);
 	BOOL  bGetCompName = true;
 
-	if (_domain_name)
+	if (_domain_name && _domain_name[0])
 		wcscpy_s(wsz, ARRAYSIZE(wsz), _domain_name);
 	else
 		bGetCompName = GetComputerNameW(wsz, &cch);
 
-    if (_domain_name || bGetCompName)
+    if ((_domain_name && _domain_name[0]) || bGetCompName)
     {
         PWSTR pwzProtectedPassword;
 
@@ -804,7 +817,13 @@ HRESULT COpenOTPCredential::_OpenOTPCheck(
 	HRESULT hr = E_FAIL;
 
 	openotp_login_rep_t *lrep = NULL;
-	openotp_login_req_t *lreq = NULL;	
+	openotp_login_req_t *lreq = NULL;
+
+	INIT_ZERO_CHAR(c_user, 64);
+	INIT_ZERO_CHAR(c_domain, 64);
+	INIT_ZERO_CHAR(c_ldapPass, 64);
+	INIT_ZERO_CHAR(c_otpPass, 64);
+	INIT_ZERO_CHAR(c_ip_addr, MAX_IP_LENGTH);
 
 	//// INITIALIZE OPENOTP
 	if (!openotp_initialize(
@@ -815,20 +834,12 @@ HRESULT COpenOTPCredential::_OpenOTPCheck(
 		_openotp_soap_timeout, 
 		NULL)) goto CleanUpAndReturn;
 
-	//// FORM REQUEST
-	char c_user[64], c_domain[64], c_ldapPass[64], c_otpPass[64], c_ip_addr[MAX_IP_LENGTH];
-
-	ZeroMemory(c_user, sizeof(c_user));
-	ZeroMemory(c_domain, sizeof(c_domain));
-	ZeroMemory(c_ldapPass, sizeof(c_ldapPass));
-	ZeroMemory(c_otpPass, sizeof(c_otpPass));
-	ZeroMemory(c_ip_addr, sizeof(c_ip_addr));
-	
-	_WideCharToChar(user, sizeof(c_ldapPass), c_user);
+	_WideCharToChar(user, sizeof(c_user), c_user);
 	_WideCharToChar(domain, sizeof(c_domain), c_domain);
 	_WideCharToChar(ldapPass, sizeof(c_ldapPass), c_ldapPass);
 	_WideCharToChar(otpPass, sizeof(c_ldapPass), c_otpPass);
 
+	//// FORM REQUEST
 	_GetFirstActiveIPAddress(c_ip_addr);
 
 	lreq = openotp_login_req_new();
@@ -876,11 +887,11 @@ HRESULT COpenOTPCredential::_OpenOTPCheck(
 	hr = S_OK;
 
 CleanUpAndReturn:
-	ZeroMemory(c_user, sizeof(c_user));
-	ZeroMemory(c_domain, sizeof(c_domain));
-	ZeroMemory(c_ldapPass, sizeof(c_ldapPass));
-	ZeroMemory(c_otpPass, sizeof(c_otpPass));
-	ZeroMemory(c_ip_addr, sizeof(c_ip_addr));
+	ZERO(c_user);
+	ZERO(c_domain);
+	ZERO(c_ldapPass);
+	ZERO(c_otpPass);
+	ZERO(c_ip_addr);
 
 	_ClearOpenOTPLoginReqRep(lreq, lrep);
 	openotp_terminate(NULL);
@@ -897,6 +908,8 @@ HRESULT COpenOTPCredential::_OpenOTPChallenge(
 	openotp_challenge_rep_t *crep = NULL;
 	openotp_challenge_req_t *creq = NULL;
 
+	INIT_ZERO_CHAR(c_challenge, 64);
+
 	//// INITIALIZE OPENOTP
 	if (!openotp_initialize(
 		(_openotp_server_url[0]    == NULL) ? NULL : _openotp_server_url, 
@@ -906,13 +919,9 @@ HRESULT COpenOTPCredential::_OpenOTPChallenge(
 		_openotp_soap_timeout, 
 		NULL)) goto CleanUpAndReturn;
 
-	//// FORM REQUEST
-	char c_challenge[64];
-
-	ZeroMemory(c_challenge, sizeof(c_challenge));
-
 	_WideCharToChar(challenge, sizeof(c_challenge), c_challenge);
 
+	//// FORM REQUEST
 	creq = openotp_challenge_req_new();
     creq->otpPassword = _strdup(c_challenge);
 
@@ -941,7 +950,7 @@ HRESULT COpenOTPCredential::_OpenOTPChallenge(
 CleanUpAndReturn:
 	//openotp_challenge_req_free(creq);
 	//openotp_challenge_rep_free(crep);
-	ZeroMemory(c_challenge, sizeof(c_challenge));
+	ZERO(c_challenge);
 
 	_ClearOpenOTPChallengeReqRep(creq, crep);	
 	openotp_terminate(NULL);
@@ -949,7 +958,7 @@ CleanUpAndReturn:
 	return hr;
 }
 
-void COpenOTPCredential::_GetUserAndDomainName(
+void COpenOTPCredential::_SeparateUserAndDomainName(
 	__in wchar_t *domain_slash_username,
 	__out wchar_t *username,
 	__in int sizeUsername,

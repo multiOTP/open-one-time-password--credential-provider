@@ -19,7 +19,7 @@
 ** * * * * * * * * * * * * * * * * * * */
 -->
 <Include>  
-  <?define Version = "1.0.2" ?>
+  <?define Version = "1.0.3" ?>
 
   <?define BaseProductName = "OpenOTP™ Credential Provider for Windows" ?>
   <?define Manufacturer = "Blacksheep Domination Soft" ?>

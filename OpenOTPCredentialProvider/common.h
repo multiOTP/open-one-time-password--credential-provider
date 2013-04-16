@@ -28,6 +28,17 @@
 
 #define MAX_ULONG  ((ULONG)(-1))
 
+#define ZERO(NAME) \
+	ZeroMemory(NAME, sizeof(NAME))
+
+#define INIT_ZERO_WCHAR(NAME, SIZE) \
+	wchar_t NAME[SIZE]; \
+	ZERO(NAME)
+
+#define INIT_ZERO_CHAR(NAME, SIZE) \
+	char NAME[SIZE]; \
+	ZERO(NAME)
+
 // The indexes of each of the fields in our credential provider's appended tiles.
 enum SAMPLE_FIELD_ID 
 {

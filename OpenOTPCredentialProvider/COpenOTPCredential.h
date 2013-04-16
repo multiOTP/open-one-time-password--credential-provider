@@ -145,7 +145,7 @@ class COpenOTPCredential : public ICredentialProviderCredential
 		__out_opt openotp_login_rep_t *lrep
 		);
 
-	void COpenOTPCredential::_GetUserAndDomainName(
+	void COpenOTPCredential::_SeparateUserAndDomainName(
 		__in wchar_t *domain_slash_username,
 		__out wchar_t *username,
 		__in int sizeUsername,

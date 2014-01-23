@@ -19,17 +19,17 @@
 ** * * * * * * * * * * * * * * * * * * */
 -->
 <Include>  
-  <?define Version = "1.0.3" ?>
+  <?define Version = "1.0.4" ?>
 
   <?define BaseProductName = "OpenOTP™ Credential Provider for Windows" ?>
-  <?define Manufacturer = "Blacksheep Domination Soft" ?>
+  <?define Manufacturer = "Last Squirrel IT" ?>
   
   <?ifdef RCDevs ?>
     <?define Publisher = "RCDevs Security Solutions" ?>
     <?define AppURLInfoAbout = "http://www.rcdevs.com" ?>
   <?else ?>    
     <?define Publisher = "$(var.Manufacturer)" ?>
-  <?define AppURLInfoAbout = "http://coming.soon" ?>
+  <?define AppURLInfoAbout = "http://www.lastsquirrel.com" ?>
   <?endif ?>
   
   <?define ProductFolderName = "OpenOTP Credential Provider" ?>

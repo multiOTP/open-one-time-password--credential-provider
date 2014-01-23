@@ -1,6 +1,6 @@
 /*
  OpenOTP Development Library
- Copyright (c) 2010-2011 RCDevs SA, All rights reserved.
+ Copyright (c) 2010-2013 RCDevs SA, All rights reserved.
  
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
@@ -68,6 +68,9 @@ int openotp_initialize (char *url, char *cert, char *pass, char *ca, int timeout
 	 herror_release(err);
 	 return 0;
       }
+      
+      // initialize OpenSSL thread locking
+      thread_setup();
    }
    #endif
    
@@ -76,7 +79,7 @@ int openotp_initialize (char *url, char *cert, char *pass, char *ca, int timeout
       if (log_handler != NULL) (*log_handler)(herror_message(err));
       herror_release(err);
       return 0;
-      }
+   }
    
    if (timeout != 0) httpd_set_timeout(timeout);
    return 1;
@@ -92,6 +95,7 @@ int openotp_terminate (void(*log_handler)()) {
    #ifdef HAVE_SSL
    if ((__openotp_url1 != NULL && strncmp(__openotp_url1, "https://", 8) == 0) ||
        (__openotp_url2 != NULL && strncmp(__openotp_url2, "https://", 8) == 0)) {
+      thread_cleanup();
       hssl_module_destroy();
    }
    #endif

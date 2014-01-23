@@ -1,6 +1,6 @@
 /*
  RCDevs OpenOTP Development Library
- Copyright (c) 2010-2011 RCDevs SA, All rights reserved.
+ Copyright (c) 2010-2013 RCDevs SA, All rights reserved.
  
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
@@ -72,7 +72,7 @@ int opensso_initialize (char *url, char *cert, char *pass, char *ca, int timeout
       if (log_handler != NULL) (*log_handler)(herror_message(err));
       herror_release(err);
       return 0;
-      }
+   }
    
    if (timeout != 0) httpd_set_timeout(timeout);
    return 1;

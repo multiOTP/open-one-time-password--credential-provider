@@ -157,7 +157,7 @@
       <Directory Id="$(var.PlatformSystemFolder)">
         
         <!-- Core components -->
-        <Component Location="local" Guid="3b6008b2-e228-4f6f-a951-b216cf503662">
+        <Component Location="local" Guid="3b6008b2-e228-4f6f-a951-b216cf503662" Shared="yes">
           <?if $(var.Platform) = x64 ?>
             <File Id="LibOpenOTP"
                   Name="libopenotp.dll"

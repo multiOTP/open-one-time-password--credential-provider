@@ -127,6 +127,8 @@ COpenOTPCredential::~COpenOTPCredential()
 	_openotp_is_challenge_request = false;
 	openotp_terminate(NULL);
 	///
+
+	DllRelease();
 }
 
 // Initializes one credential with the field information passed in.
@@ -563,7 +565,6 @@ HRESULT COpenOTPCredential::GetSerialization(
 
 	if (!_openotp_is_challenge_request)
 	{   
-		//hrOpenOtp = _OpenOTPCheck(username, domain, _rgFieldStrings[SFI_OTP_LDAP_PASS], _rgFieldStrings[SFI_OTP_PASS]);
 		hrOpenOtp = _OpenOTPCheck(username, _domain_name, _rgFieldStrings[SFI_OTP_LDAP_PASS], _rgFieldStrings[SFI_OTP_PASS]);
 	}
 	else
@@ -579,7 +580,6 @@ HRESULT COpenOTPCredential::GetSerialization(
 	{
 		if (hrOpenOtp == OOTP_CHALLENGE)
 		{
-			//**/SHStrDupW(L"Your one-time password was sent to you, please enter it on the next screen.", ppwszOptionalStatusText);
 			*pcpsiOptionalStatusIcon = CPSI_NONE;
 			*pcpgsr = CPGSR_NO_CREDENTIAL_NOT_FINISHED;
 
@@ -601,13 +601,6 @@ HRESULT COpenOTPCredential::GetSerialization(
 		{
 			if (_pCredProvCredentialEvents)
 			{
-				//wchar_t *large_text = NULL;
-				//if (_openotp_login_response.message) 
-				//{
-				//	int size = MultiByteToWideChar(CP_ACP, 0, _openotp_login_response.message, -1, large_text, 0);
-				//	MultiByteToWideChar(CP_ACP, 0, _openotp_login_response.message, -1, large_text, size);
-				//}
-
 				// TODO: Show default fail message if .message is NULL
 
 				if (_cpus == CPUS_UNLOCK_WORKSTATION)
@@ -623,7 +616,6 @@ HRESULT COpenOTPCredential::GetSerialization(
 				_pCredProvCredentialEvents->SetFieldString(this, SFI_OTP_CHALLENGE,    L"");
 			}
 
-			//**/SHStrDupW(I18N_RESYNC_FAILED, ppwszOptionalStatusText);
 			if (_openotp_login_response.message)
 			{
 				wchar_t error_msg[100];
@@ -668,7 +660,6 @@ HRESULT COpenOTPCredential::GetSerialization(
 
 		_openotp_is_challenge_request = false;
 
-		//**/SHStrDupW(I18N_RESYNC_FAILED, ppwszOptionalStatusText);
 		if (_openotp_challenge_response.message)
 		{
 			wchar_t error_msg[100];

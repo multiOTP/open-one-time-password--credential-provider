@@ -130,6 +130,11 @@ typedef struct tiqr_status_rep_t {
 #define EXPORT extern
 #endif
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /* 
  * tiqr_initialize() parameters:
  * - url: TiQR SOAP server URL (mandatory)
@@ -172,5 +177,9 @@ EXPORT void tiqr_session_qr_req_free(tiqr_session_qr_req_t *request);
 EXPORT void tiqr_session_qr_rep_free(tiqr_session_qr_rep_t *response);
 
 EXPORT void tiqr_status_rep_free(tiqr_status_rep_t *response); 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

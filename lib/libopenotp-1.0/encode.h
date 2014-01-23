@@ -1,6 +1,6 @@
 /*
  RCDevs OpenOTP Development Library
- Copyright (c) 2010-2011 RCDevs SA, All rights reserved.
+ Copyright (c) 2010-2013 RCDevs SA, All rights reserved.
  
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
@@ -17,8 +17,8 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef WL_ENCODE_H
-#define WL_ENCODE_H
+#ifndef __ENCODE_H
+#define __ENCODE_H
 
 #include <stdio.h>
 #include <string.h>

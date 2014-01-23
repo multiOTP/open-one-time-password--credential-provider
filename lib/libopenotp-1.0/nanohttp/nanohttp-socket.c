@@ -453,17 +453,30 @@ hsocket_select_read(int sock, char *buf, size_t len)
   timeout.tv_sec = httpd_get_timeout();
   timeout.tv_usec = 0;
   ret = select(sock + 1, &fds, NULL, NULL, &timeout);
-  if (ret == 0)
-  {
-    //errno = ETIMEDOUT;
+  if (ret == 0) {
     log_verbose2("Socket %d timeout", sock);
     return -1;
   }
+  // RCDEVS ADDED
+  if (ret == -1) {
+     // if interrupted by signals - return no data
+     if (errno == EINTR) return 0;
+     else {
+	log_verbose2("Socket %d select error", sock);
+	return -1;
+     }
+  }
 #ifdef WIN32
-  return recv(sock, buf, len, 0);
+  ret = recv(sock, buf, len, 0);
 #else
-  return read(sock, buf, len);
+  ret = read(sock, buf, len);
 #endif
+  // RCDEVS ADDED
+  if (ret <= 0) {
+    log_verbose2("Socket %d read error", sock);
+    return -1;
+  }
+  return ret;
 }
 
 herror_t

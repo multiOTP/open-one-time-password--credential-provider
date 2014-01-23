@@ -23,6 +23,9 @@ tiqr.o: tiqr.h tiqr.c
 encode.o: encode.h encode.c 
 	$(CC) $(CFLAGS) -c encode.c
 
+ssllock.o: ssllock.h ssllock.c 
+	$(CC) $(CFLAGS) -c ssllock.c
+
 soap-client.o: libcsoap/soap-client.h libcsoap/soap-client.c 
 	$(CC) $(CFLAGS) -c libcsoap/soap-client.c -o libcsoap/soap-client.o
 
@@ -68,16 +71,16 @@ nanohttp-ssl.o: nanohttp/nanohttp-ssl.h nanohttp/nanohttp-ssl.c
 nanohttp-stream.o: nanohttp/nanohttp-stream.h nanohttp/nanohttp-stream.c
 	$(CC) $(CFLAGS) -c nanohttp/nanohttp-stream.c -o nanohttp/nanohttp-stream.o
 
-libopenotp.a: openotp.o opensso.o tiqr.o encode.o \
+libopenotp.a: openotp.o opensso.o tiqr.o encode.o ssllock.o \
 	libcsoap/soap-client.o libcsoap/soap-ctx.o libcsoap/soap-env.o libcsoap/soap-fault.o libcsoap/soap-xml.o \
 	nanohttp/nanohttp-client.o nanohttp/nanohttp-ssl.o nanohttp/nanohttp-socket.o nanohttp/nanohttp-common.o \
 	nanohttp/nanohttp-response.o nanohttp/nanohttp-stream.o nanohttp/nanohttp-server.o nanohttp/nanohttp-request.o \
 	nanohttp/nanohttp-logging.o nanohttp/nanohttp-mime.o
-	ar rc libopenotp.a openotp.o opensso.o tiqr.o encode.o libcsoap/soap-*.o nanohttp/nanohttp-*.o
+	ar rc libopenotp.a openotp.o opensso.o tiqr.o encode.o ssllock.o libcsoap/soap-*.o nanohttp/nanohttp-*.o
 
 libopenotp.so: libopenotp.a
 	$(CC) $(CFLAGS) $(LDFLAGS) -shared -Wl,-soname,libopenotp.so.1 -o libopenotp.so.$(VERSION) \
-	openotp.o opensso.o tiqr.o encode.o libcsoap/soap-*.o nanohttp/nanohttp-*.o \
+	openotp.o opensso.o tiqr.o encode.o ssllock.o libcsoap/soap-*.o nanohttp/nanohttp-*.o \
 	-lpthread -ldl -lm -lxml2 -lssl -lcrypto
 	rm -f libopenotp.so.1 libopenotp.so
 	ln -s libopenotp.so.$(VERSION) libopenotp.so.1

@@ -1,5 +1,7 @@
-1.0.7-1
+1.0.7-2
      - Fixed issues with OpenOTP SSL endpoints.
+     - Added threading suuport with SSL endpoints.
+     - Fixed a bug causing a loop when server socket close and restart.
 
 1.0.7
      - Added support for OpenOTP v1.1.0 and the opneotpSimpleLogin API.

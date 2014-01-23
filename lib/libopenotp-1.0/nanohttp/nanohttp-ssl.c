@@ -280,7 +280,7 @@ _hssl_library_init(void)
     SSL_library_init();
     SSL_load_error_strings();
     ERR_load_crypto_strings();
-    //OpenSSL_add_ssl_algorithms();
+    OpenSSL_add_ssl_algorithms();
     initialized = 1;
   }
 

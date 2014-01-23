@@ -56,8 +56,8 @@ HRESULT COpenOTPCredentialProviderFilter::Filter(CREDENTIAL_PROVIDER_USAGE_SCENA
 				if ( i < dwFlags )
 				{ } 
 				//if (IsEqualGUID(rgclsidProviders[i], CLSID_PasswordCredentialProvider))
-				// Only allow OTP CPs (Logon and Resync)
-				if (IsEqualGUID(rgclsidProviders[i], CLSID_COTP_LOGON)/* || IsEqualGUID(rgclsidProviders[i], CLSID_COTP_RESYNC)*/) {
+				// Only allow OTP CPs
+				if (IsEqualGUID(rgclsidProviders[i], CLSID_COTP_LOGON) || IsEqualGUID(rgclsidProviders[i], CLSID_ADD_1)) {
 					rgbAllow[i] = TRUE; 
 				} else {
 					rgbAllow[i] = FALSE; 

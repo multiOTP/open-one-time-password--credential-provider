@@ -3,9 +3,9 @@
 #include <stdio.h>
 
 //#if !defined(_WIN64)
-	#define REGISTRY_BASE_KEY L"SOFTWARE\\Blacksheep Domination Soft\\OpenOTP"
+	#define REGISTRY_BASE_KEY L"SOFTWARE\\Last Squirrel IT\\OpenOTP-CP"
 //#else
-//	#define REGISTRY_BASE_KEY L"SOFTWARE\\Wow6432Node\\Blacksheep Domination Soft\\OpenOTP"
+//	#define REGISTRY_BASE_KEY L"SOFTWARE\\Wow6432Node\\Last Squirrel IT\\OpenOTP-CP"
 //#endif
 
 
